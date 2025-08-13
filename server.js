@@ -10,17 +10,17 @@ const io = socketIo(server, {
   pingInterval: 25000
 });
 
-app.use(express.static('public'));
-
 // Serve landing page as default
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(__dirname + '/public/landingpage.html');
 });
 
 // Serve game at /game route
 app.get('/game', (req, res) => {
   res.sendFile(__dirname + '/public/game.html');
 });
+
+app.use(express.static('public'));
 
 const rooms = new Map();
 
