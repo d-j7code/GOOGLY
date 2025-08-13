@@ -12,6 +12,16 @@ const io = socketIo(server, {
 
 app.use(express.static('public'));
 
+// Serve landing page as default
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+// Serve game at /game route
+app.get('/game', (req, res) => {
+  res.sendFile(__dirname + '/public/game.html');
+});
+
 const rooms = new Map();
 
 class HandCricketGame {
