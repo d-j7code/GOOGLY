@@ -103,13 +103,18 @@ class HandCricketGame {
                 btn.classList.remove('selected');
             });
             
+            // Clear any existing timer
+            if (this.selectionTimer) {
+                clearInterval(this.selectionTimer);
+            }
+            
             // Start 4-second selection timer
             let timeLeft = 4;
             const statusElement = document.getElementById('selectionStatus');
             statusElement.textContent = `Select quickly! ${timeLeft}s remaining`;
             statusElement.classList.remove('urgent');
             
-            const selectionTimer = setInterval(() => {
+            this.selectionTimer = setInterval(() => {
                 timeLeft--;
                 if (timeLeft > 0) {
                     statusElement.textContent = `Select quickly! ${timeLeft}s remaining`;
@@ -117,7 +122,8 @@ class HandCricketGame {
                         statusElement.classList.add('urgent');
                     }
                 } else {
-                    clearInterval(selectionTimer);
+                    clearInterval(this.selectionTimer);
+                    this.selectionTimer = null;
                     statusElement.classList.remove('urgent');
                     if (this.selectedNumber === null) {
                         statusElement.textContent = 'Time up!';

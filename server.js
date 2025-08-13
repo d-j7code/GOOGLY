@@ -45,23 +45,44 @@ class HandCricketGame {
 
   removePlayer(playerId) {
     this.players = this.players.filter(p => p.id !== playerId);
+    
+    // Clean up timers if no players left
+    if (this.players.length === 0) {
+      if (this.countdownTimer) {
+        clearInterval(this.countdownTimer);
+        this.countdownTimer = null;
+      }
+      if (this.selectionTimeout) {
+        clearTimeout(this.selectionTimeout);
+        this.selectionTimeout = null;
+      }
+    }
   }
 
   startCountdown(io, roomCode) {
+    // Clear any existing timers
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+    }
+    if (this.selectionTimeout) {
+      clearTimeout(this.selectionTimeout);
+    }
+    
     this.currentRound = { selections: {}, countdown: 3 };
     this.gamePhase = 'countdown';
     
-    const countdownInterval = setInterval(() => {
+    this.countdownTimer = setInterval(() => {
       io.to(roomCode).emit('countdown', this.currentRound.countdown);
       this.currentRound.countdown--;
       
       if (this.currentRound.countdown < 0) {
-        clearInterval(countdownInterval);
+        clearInterval(this.countdownTimer);
+        this.countdownTimer = null;
         this.gamePhase = 'selecting';
         io.to(roomCode).emit('selectPhase');
         
         // Auto-timeout after 4 seconds if no selection
-        setTimeout(() => {
+        this.selectionTimeout = setTimeout(() => {
           if (this.gamePhase === 'selecting') {
             // Fill missing selections and process
             const playerIds = this.players.map(p => p.id);
@@ -83,6 +104,7 @@ class HandCricketGame {
               }
             }
           }
+          this.selectionTimeout = null;
         }, 4000);
       }
     }, 1000);
