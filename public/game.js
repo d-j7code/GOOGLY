@@ -263,9 +263,9 @@ class HandCricketGame {
         const currentPlayerText = isBatting ? 'Your turn to bat' : 'Your turn to bowl';
         document.getElementById('currentPlayer').textContent = currentPlayerText;
         
-        // Update game status with target info for second innings
+        // Update game status with target info for second innings only
         let statusText = 'Ready for next round!';
-        if (this.game.currentBatsman === 1 && this.game.scores[0] > 0) {
+        if (this.game.innings === 2 && this.game.scores[0] > 0) {
             const target = this.game.scores[0] + 1;
             const needed = target - this.game.scores[1];
             statusText = `Target: ${target} | Need: ${needed} runs to win`;

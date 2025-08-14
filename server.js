@@ -33,6 +33,7 @@ class HandCricketGame {
     this.gamePhase = 'waiting'; // waiting, toss, playing, finished
     this.currentRound = { selections: {}, countdown: 0 };
     this.countdownTimer = null;
+    this.innings = 1; // Track which innings we're in (1 or 2)
   }
 
   addPlayer(playerId, playerName) {
@@ -163,7 +164,7 @@ class HandCricketGame {
 
     if (result.isOut) {
       // Mark that this batsman's innings is over
-      if (this.currentBatsman === 0) {
+      if (this.innings === 1) {
         // First innings over, prepare for second innings
         this.gamePhase = 'innings_break';
       } else {
@@ -174,7 +175,8 @@ class HandCricketGame {
       this.scores[this.currentBatsman] += result.runs;
       
       // Check if second innings target is achieved (need to beat first innings score)
-      if (this.currentBatsman === 1 && this.scores[1] > this.scores[0]) {
+      // Only check this during second innings
+      if (this.innings === 2 && this.scores[this.currentBatsman] > this.scores[1 - this.currentBatsman]) {
         this.gamePhase = 'finished';
         result.targetAchieved = true;
       } else {
@@ -331,8 +333,9 @@ io.on('connection', (socket) => {
     const game = rooms.get(socket.roomCode);
     if (!game || game.gamePhase !== 'innings_break') return;
     
-    // Switch batsman for second innings
-    game.currentBatsman = 1;
+    // Switch to second innings
+    game.innings = 2;
+    game.currentBatsman = 1 - game.currentBatsman; // Switch batsman
     game.gamePhase = 'playing';
     io.to(socket.roomCode).emit('gameUpdate', game);
   });
