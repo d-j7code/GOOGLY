@@ -342,7 +342,7 @@ class HandCricketGame {
         
         document.getElementById('inningsMessage').textContent = 
             `${this.game.players[firstBatsmanIndex].name} scored ${firstInningsScore} runs`;
-        document.getElementById('target').textContent = firstInningsScore + 1;
+        document.getElementById('target').textContent = target;
         this.showScreen('inningsBreak');
     }
 
