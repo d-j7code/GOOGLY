@@ -104,6 +104,9 @@ class HandCricketGame {
                   io.to(roomCode).emit('gameFinished', { matchSummary, game: this });
                 } else if (this.gamePhase === 'innings_break') {
                   io.to(roomCode).emit('inningsBreak', this);
+                } else if (this.gamePhase === 'playing') {
+                  // Send updated game state so scores are displayed
+                  io.to(roomCode).emit('gameUpdate', this);
                 }
               }, 3000);
             }
@@ -324,6 +327,9 @@ io.on('connection', (socket) => {
           io.to(socket.roomCode).emit('gameFinished', { matchSummary, game });
         } else if (game.gamePhase === 'innings_break') {
           io.to(socket.roomCode).emit('inningsBreak', game);
+        } else if (game.gamePhase === 'playing') {
+          // Send updated game state so scores are displayed
+          io.to(socket.roomCode).emit('gameUpdate', game);
         }
       }, 3000);
     }

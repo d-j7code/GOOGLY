@@ -311,7 +311,7 @@ class HandCricketGame {
         
         const resultMessage = document.getElementById('resultMessage');
         if (result.isOut) {
-            resultMessage.textContent = 'OUT! Same numbers selected!';
+            resultMessage.textContent = 'OUT!';
             resultMessage.className = 'result-message out';
         } else if (result.targetAchieved) {
             resultMessage.textContent = `${result.runs} runs! TARGET ACHIEVED! 🎉`;
