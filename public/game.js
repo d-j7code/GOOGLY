@@ -265,9 +265,14 @@ class HandCricketGame {
         
         // Update game status with target info for second innings only
         let statusText = 'Ready for next round!';
-        if (this.game.innings === 2 && this.game.scores[0] > 0) {
-            const target = this.game.scores[0] + 1;
-            const needed = target - this.game.scores[1];
+        if (this.game.innings === 2) {
+            // First batsman is opposite of current batsman (since we switched for second innings)
+            const firstBatsmanIndex = 1 - this.game.currentBatsman;
+            const secondBatsmanIndex = this.game.currentBatsman;
+            const firstInningsScore = this.game.scores[firstBatsmanIndex];
+            const secondInningsScore = this.game.scores[secondBatsmanIndex];
+            const target = firstInningsScore + 1;
+            const needed = target - secondInningsScore;
             statusText = `Target: ${target} | Need: ${needed} runs to win`;
         }
         document.getElementById('gameStatus').textContent = statusText;
@@ -331,9 +336,13 @@ class HandCricketGame {
     }
 
     showInningsBreak() {
+        // First batsman is opposite of current batsman (since we switched for second innings)
+        const firstBatsmanIndex = 1 - this.game.currentBatsman;
+        const firstInningsScore = this.game.scores[firstBatsmanIndex];
+        
         document.getElementById('inningsMessage').textContent = 
-            `${this.game.players[0].name} scored ${this.game.scores[0]} runs`;
-        document.getElementById('target').textContent = this.game.scores[0] + 1;
+            `${this.game.players[firstBatsmanIndex].name} scored ${firstInningsScore} runs`;
+        document.getElementById('target').textContent = firstInningsScore + 1;
         this.showScreen('inningsBreak');
     }
 

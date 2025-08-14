@@ -199,22 +199,26 @@ class HandCricketGame {
 
   getMatchSummary() {
     const winner = this.getWinner();
-    const target = this.scores[0] + 1;
-    const margin = Math.abs(this.scores[0] - this.scores[1]);
     
-    // Determine who batted first based on tossWinner choice
-    const firstBatsman = this.players[0];
-    const secondBatsman = this.players[1];
+    // Determine who batted first - it's whoever was currentBatsman when innings was 1
+    // Since we switch batsman for second innings, first batsman is opposite of current
+    const firstBatsmanIndex = 1 - this.currentBatsman;
+    const secondBatsmanIndex = this.currentBatsman;
+    
+    const firstInningsScore = this.scores[firstBatsmanIndex];
+    const secondInningsScore = this.scores[secondBatsmanIndex];
+    const target = firstInningsScore + 1;
+    const margin = Math.abs(firstInningsScore - secondInningsScore);
     
     let summary = {
       winner,
       firstInnings: {
-        batsman: firstBatsman.name,
-        score: this.scores[0]
+        batsman: this.players[firstBatsmanIndex].name,
+        score: firstInningsScore
       },
       secondInnings: {
-        batsman: secondBatsman.name,
-        score: this.scores[1],
+        batsman: this.players[secondBatsmanIndex].name,
+        score: secondInningsScore,
         target
       },
       result: ''
@@ -222,10 +226,10 @@ class HandCricketGame {
     
     if (winner === -1) {
       summary.result = 'Match Tied!';
-    } else if (winner === 0) {
-      summary.result = `${this.players[0].name} won by ${margin} runs`;
+    } else if (winner === firstBatsmanIndex) {
+      summary.result = `${this.players[firstBatsmanIndex].name} won by ${margin} runs`;
     } else {
-      summary.result = `${this.players[1].name} won by chasing the target`;
+      summary.result = `${this.players[secondBatsmanIndex].name} won by chasing the target`;
     }
     
     return summary;
