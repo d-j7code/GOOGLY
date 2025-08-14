@@ -145,9 +145,9 @@ class HandCricketGame {
     };
 
     if (result.isOut) {
+      // Mark that this batsman's innings is over
       if (this.currentBatsman === 0) {
-        // First innings over, switch batsman
-        this.currentBatsman = 1;
+        // First innings over, prepare for second innings
         this.gamePhase = 'innings_break';
       } else {
         // Second innings over, game finished
@@ -300,6 +300,8 @@ io.on('connection', (socket) => {
     const game = rooms.get(socket.roomCode);
     if (!game || game.gamePhase !== 'innings_break') return;
     
+    // Switch batsman for second innings
+    game.currentBatsman = 1;
     game.gamePhase = 'playing';
     io.to(socket.roomCode).emit('gameUpdate', game);
   });
