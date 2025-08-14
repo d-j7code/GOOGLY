@@ -96,12 +96,15 @@ class HandCricketGame {
             if (result) {
               io.to(roomCode).emit('roundResult', { result, game: this, timeout: true });
               
-              if (this.gamePhase === 'finished') {
-                const matchSummary = this.getMatchSummary();
-                io.to(roomCode).emit('gameFinished', { matchSummary, game: this });
-              } else if (this.gamePhase === 'innings_break') {
-                io.to(roomCode).emit('inningsBreak', this);
-              }
+              // Handle game state transitions after a delay to show result
+              setTimeout(() => {
+                if (this.gamePhase === 'finished') {
+                  const matchSummary = this.getMatchSummary();
+                  io.to(roomCode).emit('gameFinished', { matchSummary, game: this });
+                } else if (this.gamePhase === 'innings_break') {
+                  io.to(roomCode).emit('inningsBreak', this);
+                }
+              }, 3000);
             }
           }
           this.selectionTimeout = null;
@@ -115,7 +118,21 @@ class HandCricketGame {
     
     this.currentRound.selections[playerId] = number;
     
-    // Don't process immediately - wait for timeout to ensure fairness
+    // Check if both players have selected
+    const playerIds = this.players.map(p => p.id);
+    const allSelected = playerIds.every(id => this.currentRound.selections[id]);
+    
+    if (allSelected) {
+      // Clear the timeout since both players selected
+      if (this.selectionTimeout) {
+        clearTimeout(this.selectionTimeout);
+        this.selectionTimeout = null;
+      }
+      
+      const result = this.processRound();
+      return result;
+    }
+    
     return null;
   }
 
@@ -292,8 +309,22 @@ io.on('connection', (socket) => {
     const game = rooms.get(socket.roomCode);
     if (!game) return;
 
-    game.makeSelection(socket.id, number);
-    // Round will be processed automatically after 4-second timeout
+    const result = game.makeSelection(socket.id, number);
+    
+    // If both players selected, process immediately
+    if (result) {
+      io.to(socket.roomCode).emit('roundResult', { result, game });
+      
+      // Handle game state transitions after a delay to show result
+      setTimeout(() => {
+        if (game.gamePhase === 'finished') {
+          const matchSummary = game.getMatchSummary();
+          io.to(socket.roomCode).emit('gameFinished', { matchSummary, game });
+        } else if (game.gamePhase === 'innings_break') {
+          io.to(socket.roomCode).emit('inningsBreak', game);
+        }
+      }, 3000);
+    }
   });
 
   socket.on('nextInnings', () => {

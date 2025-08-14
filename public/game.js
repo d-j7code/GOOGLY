@@ -135,17 +135,6 @@ class HandCricketGame {
         this.socket.on('roundResult', (data) => {
             this.game = data.game;
             this.showRoundResult(data.result);
-            
-            // Check if game should transition to innings break or game over
-            setTimeout(() => {
-                if (this.game.gamePhase === 'innings_break') {
-                    this.showInningsBreak();
-                } else if (this.game.gamePhase === 'finished') {
-                    // Game over will be handled by gameFinished event
-                } else {
-                    this.updateGameScreen();
-                }
-            }, 3000); // Wait for result display to finish
         });
 
         this.socket.on('inningsBreak', (game) => {
@@ -332,15 +321,13 @@ class HandCricketGame {
             resultMessage.className = 'result-message runs';
         }
         
-        // Don't auto-hide if transitioning to innings break or game over
-        if (!result.isOut && !result.targetAchieved) {
-            setTimeout(() => {
-                document.getElementById('roundResult').style.display = 'none';
-                if (this.game && this.game.gamePhase === 'playing') {
-                    document.getElementById('startRoundBtn').style.display = 'block';
-                }
-            }, 3000);
-        }
+        // Auto-hide result after 3 seconds if continuing to play
+        setTimeout(() => {
+            document.getElementById('roundResult').style.display = 'none';
+            if (this.game && this.game.gamePhase === 'playing') {
+                document.getElementById('startRoundBtn').style.display = 'block';
+            }
+        }, 3000);
     }
 
     showInningsBreak() {
