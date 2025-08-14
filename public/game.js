@@ -316,7 +316,7 @@ class HandCricketGame {
         
         const resultMessage = document.getElementById('resultMessage');
         if (result.isOut) {
-            resultMessage.textContent = 'OUT!';
+            resultMessage.textContent = 'OUT! Same numbers selected!';
             resultMessage.className = 'result-message out';
         } else if (result.targetAchieved) {
             resultMessage.textContent = `${result.runs} runs! TARGET ACHIEVED! 🎉`;
@@ -336,13 +336,13 @@ class HandCricketGame {
     }
 
     showInningsBreak() {
-        // First batsman is opposite of current batsman (since we switched for second innings)
-        const firstBatsmanIndex = 1 - this.game.currentBatsman;
+        // At innings break, currentBatsman is still the first batsman (hasn't switched yet)
+        const firstBatsmanIndex = this.game.currentBatsman;
         const firstInningsScore = this.game.scores[firstBatsmanIndex];
         
         document.getElementById('inningsMessage').textContent = 
             `${this.game.players[firstBatsmanIndex].name} scored ${firstInningsScore} runs`;
-        document.getElementById('target').textContent = target;
+        document.getElementById('target').textContent = firstInningsScore + 1;
         this.showScreen('inningsBreak');
     }
 
